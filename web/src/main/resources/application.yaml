@@ -1,0 +1,27 @@
+spring:
+  web:
+    resources:
+      add-mappings: true
+      # 支持本地图片上传之后的链接，其中 file:///d的用于win系统，后面的file: 适用于mac/linux系统
+      static-locations:
+        - classpath:/static/
+        - file:///d:${image.abs-tmp-path}
+        - file:${image.abs-tmp-path}
+  thymeleaf:
+    cache: false
+    encoding: UTF-8
+    servlet:
+      content-type: text/html
+    mode: HTML5
+  servlet:
+    multipart:
+      location: D://Workspace/hui/python/RMBG-1.4/input
+
+image:
+  abs-tmp-path: d://tmp/storage
+  web-img-path: /img/
+  cdn-host: http://127.0.0.1:8080
+  process-img-suffix: _no_bg.png
+
+ai:
+  url: http://127.0.0.1:8000/rmbg
