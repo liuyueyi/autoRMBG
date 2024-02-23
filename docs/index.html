@@ -19980,6 +19980,16 @@ ${o}`);
             resultContainer.removeAttribute('src');
             resultContainer.removeAttribute('style');
         }, false);
+
+        document.getElementById('tryBtn').addEventListener('click', b => {
+            let url = document.getElementById('chooseImgUrl').value.trim();
+            if(!url) {
+                alert("输入图片链接");
+                return;
+            }
+            b.preventDefault(), predict(url)
+        });
+
     </script>
 
     <style>
@@ -20216,7 +20226,7 @@ ${o}`);
         <small style="padding:1em; margin-bottom: 1em;">remove background image</small>
 
         <div class="card-body" id="output">
-            <div class="loading" id="loading" style="display:block; width: 100%;">
+            <div class="loading" id="loading" style="display:block; margin-top: 50%; margin-left: 50%;">
                 <div></div>
                 <div></div>
                 <div></div>
@@ -20232,6 +20242,15 @@ ${o}`);
 <div>
     <button class="btn btn-primary" id="clear">clear</button>
     <label class="btn btn-link" id="example">(or try example)</label>
+</div>
+<div class="input-group mb-3" style="padding:1em; width:80%">
+    <div class="input-group-prepend">
+        <span class="input-group-text">输入图片地址：</span>
+    </div>
+    <input type="text" class="form-control" value="https://images.pexels.com/photos/1322129/pexels-photo-1322129.jpeg" id="chooseImgUrl">
+    <div class="input-group-append">
+        <button class="btn btn-outline-secondary" type="button" id="tryBtn">try</button>
+    </div>
 </div>
 <input id="upload" type="file" accept="image/*"/>
 
