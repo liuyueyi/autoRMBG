@@ -1094,7 +1094,7 @@
                                         }, "%S": function (W) {
                                             return G(W.Lc, 2)
                                         }, "%t": function () {
-                                            return "	"
+                                            return "  "
                                         }, "%u": function (W) {
                                             return W.Tb || 7
                                         }, "%U": function (W) {
@@ -2259,7 +2259,7 @@
                                         }, "%S": function (q) {
                                             return H(q.$b, 2)
                                         }, "%t": function () {
-                                            return "	"
+                                            return "  "
                                         }, "%u": function (q) {
                                             return q.Ab || 7
                                         }, "%U": function (q) {
@@ -7566,13 +7566,13 @@
 `).join("")}
     }`, p = e => h(e), l = (e, r) => {
                             const i = [`float fetchDataFromCorrectTexture(int textureIndex, int indices[${r}]) {`];
-                            for (let d = 0; d < e; ++d) d === 0 ? i.push(`	if (textureIndex == ${d}) { return _X${d}(indices); }`) : d === e - 1 ? i.push(`	else { return _X${d}(indices); }`) : i.push(`	else if (textureIndex == ${d}) { return _X${d}(indices); }`);
-                            return i.push("	}"), i.join(`
+                            for (let d = 0; d < e; ++d) d === 0 ? i.push(`  if (textureIndex == ${d}) { return _X${d}(indices); }`) : d === e - 1 ? i.push(`  else { return _X${d}(indices); }`) : i.push(` else if (textureIndex == ${d}) { return _X${d}(indices); }`);
+                            return i.push(" }"), i.join(`
 `)
                         }, o = e => {
                             const r = ["int getSizeInConcatAxisValueFromIndex(int index) {"];
-                            for (let i = 0; i < e.length; ++i) i === 0 ? r.push(`	if (index == ${i}) { return ${e[i]}; }`) : i === e.length - 1 ? r.push(`	else { return ${e[i]}; }`) : r.push(`	else if (index == ${i}) { return ${e[i]}; }`);
-                            return r.push("	}"), r.join(`
+                            for (let i = 0; i < e.length; ++i) i === 0 ? r.push(` if (index == ${i}) { return ${e[i]}; }`) : i === e.length - 1 ? r.push(`  else { return ${e[i]}; }`) : r.push(` else if (index == ${i}) { return ${e[i]}; }`);
+                            return r.push(" }"), r.join(`
 `)
                         };
                         n.parseConcatAttributes = e => (0, u.createAttributeWithCacheKey)({axis: e.attributes.getInt("axis")});
@@ -8260,8 +8260,8 @@ float process(int indices[${L}]) {
                                 })
                             }, h = l => {
                                 const o = [`float getBias(float bias[${l}], int channel) {`];
-                                for (let t = 0; t < l; ++t) t === 0 ? o.push(`	if (channel == ${t}) { return bias[${t}]; }`) : t === l - 1 ? o.push(`	else { return bias[${t}]; }`) : o.push(`	else if (channel == ${t}) { return bias[${t}]; }`);
-                                return o.push("	}"), o.join(`
+                                for (let t = 0; t < l; ++t) t === 0 ? o.push(`  if (channel == ${t}) { return bias[${t}]; }`) : t === l - 1 ? o.push(`  else { return bias[${t}]; }`) : o.push(`  else if (channel == ${t}) { return bias[${t}]; }`);
+                                return o.push(" }"), o.join(`
 `)
                             }, p = l => {
                                 if (!l || l.length !== 1) throw new Error("ImageScaler requires 1 input.");
@@ -9678,8 +9678,8 @@ value = _A(inputIdx);`, "value = min(value, _A(inputIdx));", ""]
                             l = (e, r) => (r = p(e, r), c.ShapeUtil.sortBasedOnPerm(e, r)), o = (e, r, i) => {
                                 const d = [];
                                 d.push(`void ${e}(out int a[${i}], int src[${i}]) {`);
-                                for (let g = 0; g < i; ++g) d.push(`	a[${r[g]}]=src[${g}];`);
-                                return d.push("	}"), d.join(`
+                                for (let g = 0; g < i; ++g) d.push(`  a[${r[g]}]=src[${g}];`);
+                                return d.push(" }"), d.join(`
 `)
                             }, t = e => {
                                 if (!e || e.length !== 1) throw new Error("Transpose requires 1 input.");
@@ -19904,10 +19904,12 @@ ${o}`);
 
         env$1.allowLocalModels = !1;
         env$1.backends.onnx.wasm.proxy = !0;
-        const EXAMPLE_URL = "https://images.pexels.com/photos/5965592/pexels-photo-5965592.jpeg?auto=compress&cs=tinysrgb&w=1024",
+        const EXAMPLE_URL = "https://images.pexels.com/photos/1322138/pexels-photo-1322138.jpeg?auto=compress&cs=tinysrgb&w=600",
             status = document.getElementById("status"), fileUpload = document.getElementById("upload"),
-            imageContainer = document.getElementById("container"), example = document.getElementById("example");
-        status.textContent = "Loading model...";
+            imageContainer = document.getElementById("container"), example = document.getElementById("example"), loadingTag = document.getElementById("loading");
+        const resultContainer = document.getElementById("result");
+        status.textContent = "Loading model, please wait(模型加载中，请稍后)...";
+        loadingTag.style.display="block";
         const model = await AutoModel.from_pretrained("briaai/RMBG-1.4", {config: {model_type: "custom"}}),
             processor = await AutoProcessor.from_pretrained("briaai/RMBG-1.4", {
                 config: {
@@ -19923,7 +19925,8 @@ ${o}`);
                     size: {width: 1024, height: 1024}
                 }
             });
-        status.textContent = "Ready";
+        status.textContent = "Ready, now you can try!(模型加载成功，快去试试吧~)";
+        loadingTag.style.display="none";
         example.addEventListener("click", b => {
             b.preventDefault(), predict(EXAMPLE_URL)
         });
@@ -19936,19 +19939,47 @@ ${o}`);
 
         async function predict(b) {
             const n = await RawImage.fromURL(b);
-            imageContainer.innerHTML = "", imageContainer.style.backgroundImage = `url(${b})`;
+            imageContainer.innerHTML = "",
+                imageContainer.style.backgroundImage = `url(${b})`;
             const a = n.width / n.height, [u, c] = a > 720 / 480 ? [720, 720 / a] : [480 * a, 480];
-            imageContainer.style.width = `${u}px`, imageContainer.style.height = `${c}px`, status.textContent = "Analysing...";
+            imageContainer.style.width = `${u}px`, imageContainer.style.height = `${c}px`, status.textContent = "removing image background, please wait(移除背景中，请稍后)...";
+
+            loadingTag.style.display="block";
             const {pixel_values: f} = await processor(n), {output: s} = await model({input: f}),
                 h = await RawImage.fromTensor(s[0].mul(255).to("uint8")).resize(n.width, n.height),
                 p = document.createElement("canvas");
             p.width = n.width, p.height = n.height;
+
             const l = p.getContext("2d");
             l.drawImage(n.toCanvas(), 0, 0);
             const o = l.getImageData(0, 0, n.width, n.height);
             for (let t = 0; t < h.data.length; ++t) o.data[4 * t + 3] = h.data[t];
-            l.putImageData(o, 0, 0), imageContainer.append(p), imageContainer.style.removeProperty("background-image"), imageContainer.style.background = 'url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAGUExURb+/v////5nD/3QAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAUSURBVBjTYwABQSCglEENMxgYGAAynwRB8BEAgQAAAABJRU5ErkJggg==")', status.textContent = "Done!"
+
+            l.putImageData(o, 0, 0),
+                imageContainer.append(p),
+                imageContainer.style.removeProperty("background-image"),
+                imageContainer.style.background = 'url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAGUExURb+/v////5nD/3QAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAUSURBVBjTYwABQSCglEENMxgYGAAynwRB8BEAgQAAAABJRU5ErkJggg==")';
+            status.textContent = "Done!", loadingTag.style.display="none";
+
+            resultContainer.src =  b;
+            resultContainer.style.width = `${u}px`, resultContainer.style.height =  `${c}px`;
         }
+
+        document.getElementById("clear").addEventListener('click', function(){
+            console.log("清空");
+            imageContainer.innerHTML = `<label id="upload-button" for="upload">
+        <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path fill="#000"
+                  d="M3.5 24.3a3 3 0 0 1-1.9-.8c-.5-.5-.8-1.2-.8-1.9V2.9c0-.7.3-1.3.8-1.9.6-.5 1.2-.7 2-.7h18.6c.7 0 1.3.2 1.9.7.5.6.7 1.2.7 2v18.6c0 .7-.2 1.4-.7 1.9a3 3 0 0 1-2 .8H3.6Zm0-2.7h18.7V2.9H3.5v18.7Zm2.7-2.7h13.3c.3 0 .5 0 .6-.3v-.7l-3.7-5a.6.6 0 0 0-.6-.2c-.2 0-.4 0-.5.3l-3.5 4.6-2.4-3.3a.6.6 0 0 0-.6-.3c-.2 0-.4.1-.5.3l-2.7 3.6c-.1.2-.2.4 0 .7.1.2.3.3.6.3Z">
+            </path>
+        </svg>
+        Click to upload image
+    </label>`;
+            imageContainer.style.removeProperty("background-image");
+            imageContainer.style.removeProperty("background");
+            resultContainer.removeAttribute('src');
+            resultContainer.removeAttribute('style');
+        }, false);
     </script>
 
     <style>
@@ -19984,8 +20015,20 @@ ${o}`);
 
         #container {
             position: relative;
-            width: 720px;
-            height: 480px;
+            min-height: 480px;
+            max-width: 100%;
+            max-height: 100%;
+            border: 2px dashed #D1D5DB;
+            border-radius: .75rem;
+            overflow: hidden;
+            margin-top: 1rem;
+            background-size: 100% 100%;
+            background-position: center;
+            background-repeat: no-repeat
+        }
+
+        #output {
+            min-height: 480px;
             max-width: 100%;
             max-height: 100%;
             border: 2px dashed #D1D5DB;
@@ -20031,26 +20074,165 @@ ${o}`);
             min-height: 16px;
             margin: 8px 0
         }
+
     </style>
+
+
+    <style>
+        .loading,
+        .loading > div {
+            position: relative;
+            box-sizing: border-box;
+        }
+
+        .loading {
+            display: block;
+            font-size: 0;
+            color: #000;
+        }
+
+        .loading.la-dark {
+            color: #333;
+        }
+
+        .loading > div {
+            display: inline-block;
+            float: none;
+            background-color: currentColor;
+            border: 0 solid currentColor;
+        }
+
+        .loading {
+            width: 42px;
+            height: 32px;
+        }
+
+        .loading > div:nth-child(1) {
+            position: absolute;
+            bottom: 32%;
+            left: 18%;
+            width: 14px;
+            height: 14px;
+            border-radius: 100%;
+            transform-origin: center bottom;
+            animation: ball-climbing-dot-jump 0.6s ease-in-out infinite;
+        }
+
+        .loading > div:not(:nth-child(1)) {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 14px;
+            height: 2px;
+            border-radius: 0;
+            transform: translate(60%, 0);
+            animation: ball-climbing-dot-steps 1.8s linear infinite;
+        }
+
+        .loading > div:not(:nth-child(1)):nth-child(2) {
+            animation-delay: 0ms;
+        }
+
+        .loading > div:not(:nth-child(1)):nth-child(3) {
+            animation-delay: -600ms;
+        }
+
+        .loading > div:not(:nth-child(1)):nth-child(4) {
+            animation-delay: -1200ms;
+        }
+
+        @keyframes ball-climbing-dot-jump {
+            0% {
+                transform: scale(1, 0.7);
+            }
+
+            20% {
+                transform: scale(0.7, 1.2);
+            }
+
+            40% {
+                transform: scale(1, 1);
+            }
+
+            50% {
+                bottom: 125%;
+            }
+
+            46% {
+                transform: scale(1, 1);
+            }
+
+            80% {
+                transform: scale(0.7, 1.2);
+            }
+
+            90% {
+                transform: scale(0.7, 1.2);
+            }
+
+            100% {
+                transform: scale(1, 0.7);
+            }
+        }
+
+        @keyframes ball-climbing-dot-steps {
+            0% {
+                top: 0;
+                right: 0;
+                opacity: 0;
+            }
+
+            50% {
+                opacity: 1;
+            }
+
+            100% {
+                top: 100%;
+                right: 100%;
+                opacity: 0;
+            }
+        }
+    </style>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" crossorigin="anonymous">
 </head>
 
 <body>
-<h1>Background Removal w/ <a href="http://github.com/xenova/transformers.js" target="_blank">🤗 Transformers.js</a>
-</h1>
+<!-- <h1>Background Removal <a href="http://github.com/xenova/transformers.js" target="_blank">🤗 Transformers.js</a></h1> -->
 <h4>Runs locally in your browser, powered by the <a href="https://huggingface.co/briaai/RMBG-1.4" target="_blank">RMBG V1.4 model</a> from <ahref="https://bria.ai/" target="_blank">BRIA AI</a>
 </h4>
-<div id="container">
-    <label id="upload-button" for="upload">
-        <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path fill="#000"
-                  d="M3.5 24.3a3 3 0 0 1-1.9-.8c-.5-.5-.8-1.2-.8-1.9V2.9c0-.7.3-1.3.8-1.9.6-.5 1.2-.7 2-.7h18.6c.7 0 1.3.2 1.9.7.5.6.7 1.2.7 2v18.6c0 .7-.2 1.4-.7 1.9a3 3 0 0 1-2 .8H3.6Zm0-2.7h18.7V2.9H3.5v18.7Zm2.7-2.7h13.3c.3 0 .5 0 .6-.3v-.7l-3.7-5a.6.6 0 0 0-.6-.2c-.2 0-.4 0-.5.3l-3.5 4.6-2.4-3.3a.6.6 0 0 0-.6-.3c-.2 0-.4.1-.5.3l-2.7 3.6c-.1.2-.2.4 0 .7.1.2.3.3.6.3Z">
-            </path>
-        </svg>
-        Click to upload image
-        <label id="example">(or try example)</label>
-    </label>
+<div class="row" style="width:80%; padding-left: 5%;">
+    <div id="container" class="col-6">
+        <label id="upload-button" for="upload">
+            <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path fill="#000"
+                      d="M3.5 24.3a3 3 0 0 1-1.9-.8c-.5-.5-.8-1.2-.8-1.9V2.9c0-.7.3-1.3.8-1.9.6-.5 1.2-.7 2-.7h18.6c.7 0 1.3.2 1.9.7.5.6.7 1.2.7 2v18.6c0 .7-.2 1.4-.7 1.9a3 3 0 0 1-2 .8H3.6Zm0-2.7h18.7V2.9H3.5v18.7Zm2.7-2.7h13.3c.3 0 .5 0 .6-.3v-.7l-3.7-5a.6.6 0 0 0-.6-.2c-.2 0-.4 0-.5.3l-3.5 4.6-2.4-3.3a.6.6 0 0 0-.6-.3c-.2 0-.4.1-.5.3l-2.7 3.6c-.1.2-.2.4 0 .7.1.2.3.3.6.3Z">
+                </path>
+            </svg>
+            Click to upload image
+        </label>
+    </div>
+    <div class="col-6" style="padding-left: 2em;">
+        <small style="padding:1em; margin-bottom: 1em;">remove background image</small>
+
+        <div class="card-body" id="output">
+            <div class="loading" id="loading" style="display:block; width: 100%;">
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
+            <img id="result">
+        </div>
+    </div>
 </div>
-<label id="status"></label>
+<label id="status" style="margin-bottom: 1em;"></label>
+
+
+<div>
+    <button class="btn btn-primary" id="clear">clear</button>
+    <label class="btn btn-link" id="example">(or try example)</label>
+</div>
 <input id="upload" type="file" accept="image/*"/>
 
 
