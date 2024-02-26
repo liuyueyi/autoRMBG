@@ -6,10 +6,15 @@ import com.github.hui.quick.plugin.base.file.FileWriteUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.buffer.DataBufferUtils;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -38,10 +43,13 @@ public class BgRemoveService {
     private Random random;
     private RestTemplate restTemplate;
 
+    private WebClient webClient;
+
     public BgRemoveService(ImageProperties imageProperties) {
         this.imageProperties = imageProperties;
         this.random = new Random();
         this.restTemplate = new RestTemplate();
+        this.webClient = WebClient.create();
     }
 
 
@@ -63,7 +71,36 @@ public class BgRemoveService {
     }
 
     /**
-     * 图片上传
+     * 图片移除
+     *
+     * @param filePart
+     * @return
+     */
+    public Mono<String> removeImgBg(FilePart filePart) {
+        // 将图片保存到本地
+        Mono<FileWriteUtil.FileInfo> fileInfo = DataBufferUtils.join(filePart.content()).flatMap(
+                dataBuffer -> {
+                    byte[] bytes = new byte[dataBuffer.readableByteCount()];
+                    dataBuffer.read(bytes);
+                    DataBufferUtils.release(dataBuffer); // 释放内存
+                    return Mono.just(bytes);
+                }
+        ).map(fileBytes -> saveToFile(fileBytes, null));
+
+        // 图片背景移除
+        return fileInfo.flatMap(file -> {
+            String path = file.getPath() + "/" + file.getFilename();
+            String url = aiUrl + "?name=" + path + "&type=" + file.getFileType() + "&outSuffix=" + imageProperties.getProcessImgSuffix();
+            return webClient.method(HttpMethod.GET)
+                    .uri(url)
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .map(response -> response.replaceAll("\"", "").replace(imageProperties.getAbsTmpPath(), imageProperties.getCdnHost()));
+        });
+    }
+
+    /**
+     * 图片同步上传
      *
      * @param input
      * @param fileType
@@ -93,6 +130,22 @@ public class BgRemoveService {
 
             FileWriteUtil.FileInfo fileInfo = genTmpFileName(fileType);
             FileWriteUtil.FileInfo file = FileWriteUtil.saveFileByStream(input, fileInfo);
+            return file;
+        } catch (Exception e) {
+            log.error("Parse img from httpRequest to BufferedImage error! e:", e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    public FileWriteUtil.FileInfo saveToFile(byte[] bytes, String fileType) {
+        try {
+            ByteArrayInputStream stream = new ByteArrayInputStream(bytes);
+            if (fileType == null) {
+                fileType = getFileType(stream, fileType);
+            }
+
+            FileWriteUtil.FileInfo fileInfo = genTmpFileName(fileType);
+            FileWriteUtil.FileInfo file = FileWriteUtil.saveFileByStream(stream, fileInfo);
             return file;
         } catch (Exception e) {
             log.error("Parse img from httpRequest to BufferedImage error! e:", e);
