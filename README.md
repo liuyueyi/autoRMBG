@@ -2,6 +2,10 @@
 
 基于SpringBoot3.2.2 + jdk17 + Thymeleaf + WebClient + briaai/RMBG-1.4 实现的基于AI的自动抠图服务
 
+## 系列教程
+
+- [x] [从0到1实现一个自动抠图服务](./docs/md/从0到1实现一个自动抠图服务.md)
+
 ## 启动方式
 
 ### 环境依赖
