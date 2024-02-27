@@ -13,9 +13,6 @@ spring:
     servlet:
       content-type: text/html
     mode: HTML5
-  servlet:
-    multipart:
-      location: D://Workspace/hui/python/RMBG-1.4/input
 
 image:
   abs-tmp-path: d://tmp/storage
