@@ -25,11 +25,11 @@ public class RmBgAsyncRest {
     private BgRemoveService bgRemoveService;
 
     @PostMapping(path = "upload/async/rmbg", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Mono rmImgBg(@RequestPart("img") FilePart fileMono) {
+    public Mono<ImgRemoveRes> rmImgBg(@RequestPart("img") FilePart file) {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start("抠图");
         log.info("开始执行抠图!");
-        Mono res = bgRemoveService.removeImgBg(fileMono)
+        Mono<ImgRemoveRes> res = bgRemoveService.removeBgAsync(file)
                 .flatMap(s -> Mono.just(new ImgRemoveRes(s)))
                 .onErrorResume(Mono::error);
         stopWatch.stop();

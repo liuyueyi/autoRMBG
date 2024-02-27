@@ -1,5 +1,7 @@
 package com.github.liuyueyi.ai.autormbg.service;
 
+import com.github.hui.quick.plugin.base.Base64Util;
+import com.github.hui.quick.plugin.base.DomUtil;
 import com.github.hui.quick.plugin.base.constants.MediaType;
 import com.github.hui.quick.plugin.base.file.FileReadUtil;
 import com.github.hui.quick.plugin.base.file.FileWriteUtil;
@@ -16,7 +18,9 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import javax.imageio.ImageIO;
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
@@ -71,12 +75,30 @@ public class BgRemoveService {
     }
 
     /**
+     * 移除背景图片，并返回base64格式的图片
+     *
+     * @param mFile
+     * @return
+     * @throws IOException
+     */
+    public String removeBgBase64(MultipartFile mFile) throws IOException {
+        FileWriteUtil.FileInfo file = saveToFile(mFile.getInputStream(), null);
+        String path = file.getPath() + "/" + file.getFilename();
+
+        String response = restTemplate.getForObject(aiUrl + "?name=" + path + "&type=" + file.getFileType() + "&outSuffix=" + imageProperties.getProcessImgSuffix(), String.class);
+        response = response.replaceAll("\"", "");
+        log.info("processImg: {}", file.getAbsFile());
+        String result = Base64Util.encode(ImageIO.read(new File(response)), MediaType.ImagePng.getExt());
+        return DomUtil.toDomSrc(result, MediaType.ImagePng);
+    }
+
+    /**
      * 图片移除
      *
      * @param filePart
      * @return
      */
-    public Mono<String> removeImgBg(FilePart filePart) {
+    public Mono<String> removeBgAsync(FilePart filePart) {
         // 将图片保存到本地
         Mono<FileWriteUtil.FileInfo> fileInfo = DataBufferUtils.join(filePart.content()).flatMap(
                 dataBuffer -> {
