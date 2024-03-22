@@ -17,7 +17,7 @@ linux/mac 环境安装
 ```bash
 python3.11 -m venv venv
 
-./venv/bin/python3 install -r ./requirements.txt  -i https://pypi.tuna.tsinghua.edu.cn/simple
+./venv/bin/pip install -r ./requirements.txt  -i https://pypi.tuna.tsinghua.edu.cn/simple
 ```
 
 验证是否成功
